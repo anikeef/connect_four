@@ -73,6 +73,27 @@ describe Grid do
     end
   end
 
+  describe "#find_4_in_line" do
+    before :all do
+      FakeSquare = Struct.new(:state)
+    end
+
+    it "returns nil if no winner" do
+      arr = Array.new(6) { FakeSquare.new }
+      expect(@grid.find_4_in_line(arr)).to be_nil
+    end
+
+    it "returns symbol of repeating square" do
+      arr = Array.new(6) { FakeSquare.new(:o) }
+      expect(@grid.find_4_in_line(arr)).to eq(:o)
+    end
+
+    it "works with multisymbol lines" do
+      arr = [FakeSquare.new, FakeSquare.new(:x), FakeSquare.new(:x), FakeSquare.new(:x), FakeSquare.new(:x), FakeSquare.new(:o)]
+      expect(@grid.find_4_in_line(arr)).to eq(:x)
+    end
+  end
+
   describe "#winner" do
     it "returns nil if there's no winner yet" do
       expect(@grid.winner).to be_nil
@@ -92,6 +113,21 @@ describe Grid do
     it "works with columns" do
       @grid.put_to_column(2, :x)
       4.times { @grid.put_to_column(2, :o) }
+      expect(@grid.winner).to eq(:o)
+    end
+
+    it "works with strings" do
+      @grid.put_to_column(1, :o)
+      2.upto(7) { |i| @grid.put_to_column(i, :x) }
+      expect(@grid.winner).to eq(:x)
+    end
+
+    it "works with diagonals" do
+      3.upto(5) do |n|
+        n.upto(5) { |i| @grid.put_to_column(i, :x) }
+      end
+      2.upto(5) { |i| @grid.put_to_column(i, :o) }
+
       expect(@grid.winner).to eq(:o)
     end
   end
