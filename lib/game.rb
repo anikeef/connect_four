@@ -1,8 +1,9 @@
 require "./lib/grid.rb"
 
+class IncorrectInput < StandardError; end
+
 class Game
   Player = Struct.new(:symbol, :name)
-  class IncorrectInput < StandardError; end
 
   def initialize
     print "X player's name: "
