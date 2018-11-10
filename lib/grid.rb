@@ -1,43 +1,31 @@
+class FullColumn < StandardError; end
+
 class Grid
   Square = Struct.new(:state)
 
   def initialize
-    @grid_strings = Array.new(6) { Array.new(7) {Square.new} }
-    @grid_columns = @grid_strings.transpose
     @filled_squares = 0
-    # @diagonals =
-    #   [(0..3).map { |i| @grid_strings[i+2][i] },
-    #   (0..4).map { |i| @grid_strings[i+1][i] },
-    #   (0..5).map { |i| @grid_strings[i][i] },
-    #   (0..5).map { |i| @grid_strings[i][i+1] },
-    #   (0..4).map { |i| @grid_strings[i][i+2] },
-    #   (0..3).map { |i| @grid_strings[i][i+3] },
-    #
-    #   (0..3).map { |i| @grid_strings[i+2][6-i] },
-    #   (0..4).map { |i| @grid_strings[i+1][6-i] },
-    #   (0..5).map { |i| @grid_strings[i][6-i] },
-    #   (0..5).map { |i| @grid_strings[i][5-i] },
-    #   (0..4).map { |i| @grid_strings[i][4-i] },
-    #   (0..3).map { |i| @grid_strings[i][3-i] }]
+    @strings = Array.new(6) { Array.new(7) {Square.new} }
+    @columns = @strings.transpose
 
     @diagonals = []
-      [3,4,5].each do |n|
-        @diagonals << (0..n).map { |i| @grid_strings[5-n+i][i] }
-        @diagonals << (0..n).map { |i| @grid_strings[i][6-n+i] }
-        @diagonals << (0..n).map { |i| @grid_strings[5-n+i][6-i] }
-        @diagonals << (0..n).map { |i| @grid_strings[i][n-i] }
-      end
+    [3,4,5].each do |n|
+      @diagonals << (0..n).map { |i| @strings[5-n+i][i] }
+      @diagonals << (0..n).map { |i| @strings[i][6-n+i] }
+      @diagonals << (0..n).map { |i| @strings[5-n+i][6-i] }
+      @diagonals << (0..n).map { |i| @strings[i][n-i] }
+    end
   end
 
   def to_s
-    @grid_strings.map.with_index(1) do |string, index|
+    @strings.map.with_index(1) do |string, index|
       "#{index}#{string.map { |square| " #{square.state.nil? ? " " : square.state.to_s}" }.join}\n"
     end.join.concat("  1 2 3 4 5 6 7\n")
   end
 
   def put_to_column(column_index, symbol)
-    column = @grid_columns[column_index - 1]
-    raise "Full column" if column.first.state != nil
+    column = @columns[column_index - 1]
+    raise FullColumn if column.first.state != nil
     column.reverse_each do |square|
       if square.state.nil?
         square.state = symbol
@@ -49,8 +37,8 @@ class Grid
 
   def winner
     winner =
-      find_winner_in(@grid_columns) ||
-      find_winner_in(@grid_strings) ||
+      find_winner_in(@columns) ||
+      find_winner_in(@strings) ||
       find_winner_in(@diagonals)
 
     if winner

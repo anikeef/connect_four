@@ -69,7 +69,7 @@ describe Grid do
 
     it "raises error when the column is filled" do
       6.times { @grid.put_to_column(1, :x) }
-      expect { @grid.put_to_column(1, :x) }.to raise_error("Full column")
+      expect { @grid.put_to_column(1, :x) }.to raise_error(FullColumn)
     end
   end
 
